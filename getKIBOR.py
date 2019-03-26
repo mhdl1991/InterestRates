@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
 
 #PROXY SETTINGS
-#proxy = "http://10.200.1.18:8080"
+#proxy = "[redacted]"
 
 #MONTHS AND YEARS
 years = ["2018","2017","2016","2015"]#["2018","2017","2016","2015","2014","2013","2012"]
