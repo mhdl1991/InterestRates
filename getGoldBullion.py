@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 25 16:40:25 2019
-
-@author: makhan.10371
-"""
 
 #Get Gold Bullion Rates from Bullion-Rates.com
 import requests
