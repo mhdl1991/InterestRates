@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 11 19:08:00 2019
 
-@author: makhan.10371
-"""
 #IMPORT PACKAGES
 from urllib.request import urlopen, Request
 import re, glob, os, tabula
@@ -94,8 +90,6 @@ KIBORdf = KIBORdf.reset_index()
 KIBORdf = KIBORdf.drop("index", axis = 1)
 KIBORdf.rename(columns = {"Tenor":"TENOR"}, inplace = True)
 KIBORdf.to_csv("C:\\StateBankPakistanProject\\DatadumpFolder\\KIBORdata.csv")
-
-
 
 #Try making a chart?
 KIBOR_1yr = KIBORdf['TENOR'] == '1 - Year'
