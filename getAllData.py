@@ -2,8 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
-#from sklearn import preprocessing
+import seaborn as sns
 
 #DO RENAMING OF COLUMNS BEFORE DATETIME INDEX
 
@@ -19,7 +18,6 @@ BullionRatesDataFrame = BullionRatesDataFrame.drop('Date', axis = 1)
 BullionRatesMonthAverage = BullionRatesDataFrame.resample('M').mean()
 #BullionRatesMonthAverage['Gold Price/gm'].plot()
 
-
 #GET INFLATION DATA
 inflationCSVPath = "D:\\Python36_projects\\StateBankPakistan\\InflationData.csv"
 inflationData = pd.read_csv(inflationCSVPath)
@@ -30,11 +28,10 @@ inflationData = inflationData.drop('Period', axis = 1)
 #inflationData['CPI General MoM'].plot()
 
 #GET MONTHLY INFLATION DATA (MOM)
-#THIS DATA WAS COLLECTED MANUALLY, HAD TO SET ALL THE DATES TO THE LAST DATE OF EACH MONTH
 inflationDataMonthly = inflationData[['CPI General MoM', 'CPI Food MoM', 'CPI Non-Food MoM', 'Core NFNE MoM', 'Core Trimmed MoM', 'SPI MoM', 'WPI MoM']]
 #inflationDataMonthly.plot()
 
-#GET INTEREST DATA
+#GET INTEREST/KIBOR DATA
 interestCSVPath = "D:\\Python36_projects\\StateBankPakistan\\KIBORdata.csv"
 interestData = pd.read_csv(interestCSVPath)
 interestData['DATE'] = pd.to_datetime(interestData['DATE'], format = '%Y-%m-%d')
@@ -46,6 +43,7 @@ interestData3YR = interestData['TENOR'] == "3-  Year"
 #interestData[interestData3YR].plot()
 #interestData.groupby('TENOR').plot() #Makes a number of plots, one for each tenor period
 #MONTHLY 3-YEAR INTEREST RATES (BASED ON MEAN OF DAILY INTEREST RATES FOR THAT MONTH)
+#interestDataMonthly = interestData[interestData3YR].resample('M').mean()
 interestDataMonthly = interestData[interestData3YR].resample('M').mean()
 #interestDataMonthly.plot()
 
@@ -60,29 +58,25 @@ GDPData = GDPData.drop('Year', axis = 1)
 GDPMonthlyData = GDPData.resample('M').pad()
 #GDPMonthlyData.plot()
 
+#COLLATE ALL THE DATA INTO ONE 
+dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage]
+combinedData = pd.concat(dataFramesList,axis = 1)  
+
+#INCOMPLETE DATA?
+combinedData_interpolated = combinedData.interpolate()
+
+#Save the combined DataFrame as a CSV for now
+combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", index = False)
+
+#Some data missing- KIBOR data 
+
+#MAKE A HEATMAP
+corr = combinedData_interpolated.corr()
+sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
+
+
 #USD CONVERSION RATE
 
 
 #PROPERTY RATES?
 
-
-#COLLATE ALL THE DATA INTO ONE DATAFRAME
-dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage]
-combinedData = pd.concat(dataFramesList,axis = 1)  
-
-#combinedData.fillna()
-
-#Save the combined DataFrame as a CSV for now
-combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", index = False)
-
-#Some data missing
-
-
-
-#GET THIS DATA ASAP
-
-
-#DEPOSITS = DEPENDENT 
-#INTEREST RATES, BULLION RATES, INFLATION RATES, = INDEPENDENT
-
-#ALL DATA ARE TIME BASED
