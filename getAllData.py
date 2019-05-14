@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+#from sklearn import preprocessing
+
 #DO RENAMING OF COLUMNS BEFORE DATETIME INDEX
 
 #BULLION RATES DATA
@@ -58,11 +60,20 @@ GDPData = GDPData.drop('Year', axis = 1)
 GDPMonthlyData = GDPData.resample('M').pad()
 #GDPMonthlyData.plot()
 
+#KSE100 DATA
+#KSE DATA TAKEN FROM https://markets.businessinsider.com/index/historical-prices/kse_100/1.1.2015_31.12.2018
+KSE100DataCSVPath = "D:\\Python36_projects\\StateBankPakistan\\kse100.csv"
+KSE100Data = pd.read_csv(KSE100DataCSVPath)
+#PROPERLY SET DATETIMEINDEX
+KSE100Data = KSE100Data.set_index(pd.DatetimeIndex(KSE100Data['DATE']))
+KSE100Data = KSE100Data.drop('DATE', axis = 1)
+#MONTHLY KSE100
+KSE100MonthlyData = KSE100Data.resample('M').pad()
+
 #COLLATE ALL THE DATA INTO ONE 
-dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage]
+dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData]
 combinedData = pd.concat(dataFramesList,axis = 1)  
 
-#INCOMPLETE DATA?
 combinedData_interpolated = combinedData.interpolate()
 
 #Save the combined DataFrame as a CSV for now
@@ -77,6 +88,4 @@ sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
 
 #USD CONVERSION RATE
 
-
-#PROPERTY RATES?
 
