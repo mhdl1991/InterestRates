@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+
+
+#IMPORT NEEDED LIBRARIES
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-
-#from sklearn import preprocessing
+from sklearn import preprocessing
 
 #DO RENAMING OF COLUMNS BEFORE DATETIME INDEX
 
@@ -70,6 +72,19 @@ KSE100Data = KSE100Data.drop('DATE', axis = 1)
 #MONTHLY KSE100
 KSE100MonthlyData = KSE100Data.resample('M').pad()
 
+#CRUDE OIL PRICES
+
+#DUBAI CRUDE
+
+#BRITISH BRENT
+
+#US WTI
+
+
+#USD CONVERSION RATE
+
+
+
 #COLLATE ALL THE DATA INTO ONE 
 dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData]
 combinedData = pd.concat(dataFramesList,axis = 1)  
@@ -81,11 +96,21 @@ combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", ind
 
 #Some data missing- KIBOR data 
 
+#FEATURE SCALING?
+scaler = preprocessing.StandardScaler()
+
+combinedData_interpolated[combinedData_interpolated.columns] = scaler.fit_transform(combinedData_interpolated[combinedData_interpolated.columns])
+'''
+for col in combinedData.columns:
+    combinedData[col] = scaler.transform(col)
+'''
+
 #MAKE A HEATMAP
 corr = combinedData_interpolated.corr()
 sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
+'''
+This part is seemingly unaffected by the addition of feature scaling
+'''
 
-
-#USD CONVERSION RATE
 
 
