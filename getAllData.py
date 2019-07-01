@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 #IMPORT NEEDED LIBRARIES
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -47,7 +45,6 @@ interestData3YR = interestData['TENOR'] == "3-  Year"
 #interestData[interestData3YR].plot()
 #interestData.groupby('TENOR').plot() #Makes a number of plots, one for each tenor period
 #MONTHLY 3-YEAR INTEREST RATES (BASED ON MEAN OF DAILY INTEREST RATES FOR THAT MONTH)
-#interestDataMonthly = interestData[interestData3YR].resample('M').mean()
 interestDataMonthly = interestData[interestData3YR].resample('M').mean()
 #interestDataMonthly.plot()
 
@@ -80,13 +77,20 @@ KSE100MonthlyData = KSE100Data.resample('M').pad()
 
 #US WTI
 
-
 #USD CONVERSION RATE
-
+DWARDataCSVPath = "D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv"
+DWARData = pd.read_csv(DWARDataCSVPath)
+#PROPERLY SET DATETIMEINDEX
+DWARData = DWARData.set_index(pd.DatetimeIndex(DWARData['DATE']))
+DWARData = DWARData.drop('DATE', axis = 1)
+#MONTHLY USDdataRate
+USDData = DWARData[DWARData['CURRENCY'] == "USD"]
+USDData = USDData.drop('CURRENCY', axis = 1)
+USDMonthlyData = USDData.astype(float).resample('M').mean()
 
 
 #COLLATE ALL THE DATA INTO ONE 
-dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData]
+dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData, USDMonthlyData]
 combinedData = pd.concat(dataFramesList,axis = 1)  
 
 combinedData_interpolated = combinedData.interpolate()
@@ -98,8 +102,10 @@ combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", ind
 
 #FEATURE SCALING?
 scaler = preprocessing.StandardScaler()
-
 combinedData_interpolated[combinedData_interpolated.columns] = scaler.fit_transform(combinedData_interpolated[combinedData_interpolated.columns])
+
+
+
 '''
 for col in combinedData.columns:
     combinedData[col] = scaler.transform(col)
