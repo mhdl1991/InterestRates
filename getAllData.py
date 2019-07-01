@@ -86,8 +86,10 @@ DWARData = DWARData.drop('DATE', axis = 1)
 #MONTHLY USDdataRate
 USDData = DWARData[DWARData['CURRENCY'] == "USD"]
 USDData = USDData.drop('CURRENCY', axis = 1)
-USDMonthlyData = USDData.astype(float).resample('M').mean()
-
+USDData['BUYING'] = USDData['BUYING'].str.replace(" ","")
+USDData['SELLING'] = USDData['SELLING'].str.replace(" ","")
+#USDMonthlyData = USDData.astype(float).resample('M').mean()
+USDMonthlyData = USDData.astype(float).resample('M').pad() #Got something missing?
 
 #COLLATE ALL THE DATA INTO ONE 
 dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData, USDMonthlyData]
