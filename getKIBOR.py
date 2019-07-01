@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime as dt
 from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
+from statsmodels.tsa.arima_model import ARMA
 
 #USER AGENT STRING
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
@@ -74,6 +75,14 @@ if PDFs_List:
 #ALL FILENAMES ARE IN THE FORM Kibor-DD-MMM-YY.pdf 
 #USE STRING SPLITTING STUFF TO EXTRACT THE DATE FROM THAT FILENAME
 
+def parseDate(text):
+    for fmt in ('%d-%b-%y', '%d-%b-%Y'):
+        try:
+            return dt.strptime(text, fmt).date()
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
+
 #MAKE A DATAFRAME? COLUMNS ARE TENOR, BID, OFFER, DATE
 KIBORdf = pd.DataFrame()            
 os.chdir(PDFdumpPath)
@@ -81,7 +90,7 @@ fileList = glob.glob("*.pdf")
 for file in fileList:
     fileDate = file[6:-4]     
     getData = tabula.read_pdf(file)
-    date= dt.strptime(fileDate,"%d-%b-%y").date()
+    date= parseDate(fileDate)
     getData["DATE"] = date
     KIBORdf = KIBORdf.append(getData)
 
@@ -90,8 +99,6 @@ KIBORdf = KIBORdf.reset_index()
 KIBORdf = KIBORdf.drop("index", axis = 1)
 KIBORdf.rename(columns = {"Tenor":"TENOR"}, inplace = True)
 KIBORdf.to_csv("D:\\Python36_projects\\StateBankPakistan\\KIBORdata.csv", index = False)
-
-
 
 #MAYBE ADD A STEP HERE TO LOAD FROM CSV?
 KIBORdf = pd.read_csv("D:\\Python36_projects\\StateBankPakistan\\KIBORdata.csv",date_parser = "DATE")
