@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Mon Jul  1 12:27:59 2019
+
+@author: makhan.10371
+"""
 
 #IMPORT PACKAGES
 from urllib.request import urlopen, Request
@@ -12,8 +17,7 @@ import matplotlib.pyplot as plt
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
 
 #PROXY SETTINGS
-#proxy = "http://10.200.1.18:8080"
-proxy = "http://10.200.1.17:8080"
+proxy = "[redacted]"
 
 #MONTHS AND YEARS
 years = ["2018","2017","2016"] #["2018","2017","2016","2015","2014","2013","2012"]
@@ -75,6 +79,14 @@ if PDFs_List:
 #ALL FILENAMES ARE IN THE FORM DD-MMM-YY.pdf 
 #USE STRING SPLITTING STUFF TO EXTRACT THE DATE FROM THAT FILENAME
 
+def parseDate(text):
+    for fmt in ('%d-%b-%y', '%d-%b-%Y'):
+        try:
+            return dt.strptime(text, fmt).date()
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
+
 #MAKE A DATAFRAME, COLUMNS ARE CURRENCY, BUYING, SELLING
 DWARdf = pd.DataFrame()            
 os.chdir(PDFdumpPath)
@@ -82,14 +94,13 @@ fileList = glob.glob("*.pdf")
 for file in fileList:
     fileDate = file[:-4]     
     getData = tabula.read_pdf(file)
-    date= dt.strptime(fileDate,"%d-%b-%y").date()
+    date= parseDate(fileDate)
     getData["DATE"] = date
     DWARdf = DWARdf.append(getData)
 
 DWARdf = DWARdf.sort_values(by='DATE') 
 DWARdf = DWARdf.reset_index()
 DWARdf = DWARdf.drop("index", axis = 1)
-#KIBORdf.rename(columns = {"Tenor":"TENOR"}, inplace = True)
 DWARdf.to_csv("D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv", index = False)
 
 
@@ -97,6 +108,5 @@ DWARdf.to_csv("D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv", index = 
 #MAYBE ADD A STEP HERE TO LOAD FROM CSV?
 DWARdf = pd.read_csv("D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv",date_parser = "DATE")
 DWARdf['DATE'] = pd.to_datetime(DWARdf['DATE'], format = '%Y-%m-%d')
-#DWARdf = DWARdf.drop('Unnamed: 0', axis = 1)
 DWARdf.index = DWARdf['DATE']
 DWARdf = DWARdf.drop('DATE', axis = 1)
