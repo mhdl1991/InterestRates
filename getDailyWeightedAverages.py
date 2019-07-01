@@ -35,10 +35,10 @@ for year in years:
             for a in html.select('a'):
                 download_URL = ""
                 #If the link is a download link for a PDF
-                if re.match(r"\d\d-[a-z][a-z][a-z]-\d\d\.pdf",a['href'],flags=re.IGNORECASE):
+                if re.match(r"\d\d-[a-z][a-z][a-z]-(\d\d|\d\d\d\d)\.pdf",a['href'],flags=re.IGNORECASE) :
                     download_URL = "http://www.sbp.org.pk/ecodata/rates/war/" + year +"/" + month + "/" + str(a['href'])
                     print(download_URL)
-                elif re.match(r"http://www\.sbp\.org\.pk/ecodata/rates/war/\d\d\d\d/[a-z][a-z][a-z]/\d\d-[a-z][a-z][a-z]-\d\d\.pdf", a['href'],flags=re.IGNORECASE):
+                elif re.match(r"http://www\.sbp\.org\.pk/ecodata/rates/war/\d\d\d\d/[a-z][a-z][a-z]/\d\d-[a-z][a-z][a-z]-(\d\d|\d\d\d\d)\.pdf", a['href'],flags=re.IGNORECASE):
                     #ummmmm
                     download_URL = str(a['href'])
                     print(download_URL)
