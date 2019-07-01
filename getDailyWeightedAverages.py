@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jul  1 12:27:59 2019
-
-@author: makhan.10371
-"""
 
 #IMPORT PACKAGES
 from urllib.request import urlopen, Request
