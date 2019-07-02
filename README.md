@@ -15,3 +15,5 @@ I started this project because someone at my workplace proposed the idea to obta
 and to analyse and see if there's a link between these and deposits in a bank.
 
 However, they were the ones promising to provide the deposits data, so until they do I may just try and see if I can predict interest rates using some of this info instead.
+
+Inside this folder are some scripts which scrape data from PDFs downloaded from the State Bank of Pakistan website (speficically the Economic data section)
