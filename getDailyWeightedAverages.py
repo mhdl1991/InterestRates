@@ -38,7 +38,7 @@ for year in years:
                     download_URL = "http://www.sbp.org.pk/ecodata/rates/war/" + year +"/" + month + "/" + str(a['href'])
                     print(download_URL)
                 elif re.match(r"http://www\.sbp\.org\.pk/ecodata/rates/war/\d\d\d\d/[a-z][a-z][a-z]/\d\d-[a-z][a-z][a-z]-(\d\d|\d\d\d\d)\.pdf", a['href'],flags=re.IGNORECASE):
-                    #ummmmm
+                    #slight differences in the naming conventions for the PDFs which need to be accounted for
                     download_URL = str(a['href'])
                     print(download_URL)
                 if download_URL:
@@ -73,7 +73,6 @@ if PDFs_List:
 #ONCE YOU HAVE ALL THE PDFS AND HAVE DOWNLOADED THEM IT'S TIME TO PROCESS THEM
 #ALL FILENAMES ARE IN THE FORM DD-MMM-YY.pdf 
 #USE STRING SPLITTING STUFF TO EXTRACT THE DATE FROM THAT FILENAME
-
 def parseDate(text):
     for fmt in ('%d-%b-%y', '%d-%b-%Y'):
         try:
@@ -96,12 +95,22 @@ for file in fileList:
 DWARdf = DWARdf.sort_values(by='DATE') 
 DWARdf = DWARdf.reset_index()
 DWARdf = DWARdf.drop("index", axis = 1)
+#KIBORdf.rename(columns = {"Tenor":"TENOR"}, inplace = True)
 DWARdf.to_csv("D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv", index = False)
-
-
 
 #MAYBE ADD A STEP HERE TO LOAD FROM CSV?
 DWARdf = pd.read_csv("D:\\Python36_projects\\StateBankPakistan\\DWARdata.csv",date_parser = "DATE")
+#CONVERT IT INTO A DATE/TIME INDEXED FRAME
 DWARdf['DATE'] = pd.to_datetime(DWARdf['DATE'], format = '%Y-%m-%d')
+#DWARdf = DWARdf.drop('Unnamed: 0', axis = 1)
 DWARdf.index = DWARdf['DATE']
 DWARdf = DWARdf.drop('DATE', axis = 1)
+#REMOVE SPACES
+DWARdf['BUYING'] = DWARdf['BUYING'].str.replace(" ","")
+DWARdf['SELLING'] = DWARdf['SELLING'].str.replace(" ","")
+#CONVERT NUMERIC
+DWARdf['BUYING'] = DWARdf['BUYING'].astype(float)
+DWARdf['SELLING'] = DWARdf['SELLING'].astype(float)
+
+#PLOT USD BUYING PRICES
+DWARdf[DWARdf['CURRENCY'] == 'USD']['BUYING'].plot()
