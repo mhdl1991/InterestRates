@@ -112,4 +112,4 @@ KIBOR_1yr = KIBORdf['TENOR'] == '1 - Year'
 OneYear = KIBORdf[KIBOR_1yr]
 OneYear = OneYear.drop('TENOR', axis = 1)
 OneYear = OneYear.drop('OFFER', axis = 1)
-OneYear["OFFER"].plot()
+OneYear["BID"].plot()
