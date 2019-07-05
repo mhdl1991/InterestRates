@@ -55,7 +55,7 @@ if PDFs_List:
             f.write("{}\n".format(item))
 
 #DOWNLOAD EVERYTHNG IN THE LIST:
-PDFdumpPath = "D:\\Python36_projects\\StateBankPakistan\\PDFdumpFolder\\"
+PDFdumpPath = "D:\\Python36_projects\\StateBankPakistan\\KIBORPDFdumpFolder\\"
 if PDFs_List:
     for URL in PDFs_List:
         print(URL)
@@ -106,3 +106,10 @@ KIBORdf['DATE'] = pd.to_datetime(KIBORdf['DATE'], format = '%Y-%m-%d')
 KIBORdf = KIBORdf.drop('Unnamed: 0', axis = 1)
 KIBORdf.index = KIBORdf['DATE']
 KIBORdf = KIBORdf.drop('DATE', axis = 1)
+
+#PLOT OF ONE-YEAR INTEREST RATES
+KIBOR_1yr = KIBORdf['TENOR'] == '1 - Year'
+OneYear = KIBORdf[KIBOR_1yr]
+OneYear = OneYear.drop('TENOR', axis = 1)
+OneYear = OneYear.drop('OFFER', axis = 1)
+OneYear["OFFER"].plot()
