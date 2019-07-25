@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+
 #IMPORT NEEDED LIBRARIES
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn import preprocessing
+from sklearn import preprocessing, linear_model
 
 #DO RENAMING OF COLUMNS BEFORE DATETIME INDEX
+
 #BULLION RATES DATA
 BullionRatesCSVPath = "D:\\Python36_projects\\StateBankPakistan\\BullionData.csv"
 BullionRatesDataFrame = pd.read_csv(BullionRatesCSVPath, date_parser = "Date")
@@ -41,12 +43,12 @@ interestData = interestData.drop('Unnamed: 0', axis = 1)
 interestData = interestData.set_index(pd.DatetimeIndex(interestData['DATE']))
 interestData = interestData.drop('DATE', axis = 1)
 interestData3YR = interestData['TENOR'] == "3-  Year"
-interestData3YR = interestData3YR.rename(columns = {'BID':'KIBOR BID', 'OFFER': 'KIBOR OFFER'})
 #interestData[interestData3YR].plot()
 #interestData.groupby('TENOR').plot() #Makes a number of plots, one for each tenor period
 #MONTHLY 3-YEAR INTEREST RATES (BASED ON MEAN OF DAILY INTEREST RATES FOR THAT MONTH)
 #interestDataMonthly = interestData[interestData3YR].resample('M').mean()
 interestDataMonthly = interestData[interestData3YR].resample('M').mean()
+interestDataMonthly = interestDataMonthly.rename(columns = {'BID':'KIBOR BID', 'OFFER': 'KIBOR OFFER'})
 #interestDataMonthly.plot()
 
 #GDP DATA
@@ -71,13 +73,8 @@ KSE100Data = KSE100Data.rename(columns = {'CLOSING PRICE':'KSE CLOSING', 'OPEN':
 #MONTHLY KSE100
 KSE100MonthlyData = KSE100Data.resample('M').pad()
 
-#CRUDE OIL PRICES
-
-#DUBAI CRUDE
-
-#BRITISH BRENT
-
-#US WTI
+#CRUDE OIL PRICES?
+#MIGHT ADD LATER
 
 #USD CONVERSION RATE
 #Taken from State Bank Pakistan site
@@ -99,29 +96,37 @@ USDMonthlyData = USDData.astype(float).resample('M').pad() #Got something missin
 dataFramesList = [GDPMonthlyData, interestDataMonthly, inflationDataMonthly, BullionRatesMonthAverage, KSE100MonthlyData, USDMonthlyData]
 combinedData = pd.concat(dataFramesList,axis = 1)  
 
+#DATA BEFORE 2016 IS NOT AVAILABLE FOR SOME DATASETS? CUT EM?
+combinedData = combinedData.loc['2016-1-1':]
+
 combinedData_interpolated = combinedData.interpolate()
-
-#Save the combined DataFrame as a CSV for now
-combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", index = False)
-
 
 #FEATURE SCALING?
 scaler = preprocessing.StandardScaler()
 combinedData_interpolated[combinedData_interpolated.columns] = scaler.fit_transform(combinedData_interpolated[combinedData_interpolated.columns])
 
 
+#Save the combined DataFrame as a CSV for now
+combinedData.to_csv("D:\\Python36_projects\\StateBankPakistan\\AllData.csv", index = False)
+
+
 #MAKE A HEATMAP
 corr = combinedData_interpolated.corr()
 sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
-'''
-This part is seemingly unaffected by the addition of feature scaling
-'''
 
-'''
-Denote some features as X and one feature as y
 #Somehow the Dollar price and Gold price are most correlated to KIBOR 
-X = combinedData_interpolated["USD BUYING", "Gold Price/gm"]
+
+#Denote some features as X and one feature as y
+X = combinedData_interpolated[["USD BUYING", "Gold Price/gm"]]
 y = combinedData_interpolated["KIBOR OFFER"]
-'''
+
+lm = linear_model.LinearRegression()
+model = lm.fit(X,y)
+predictions = lm.predict(X)
+print(predictions)[0:5]
+
+
+
+
 
 
